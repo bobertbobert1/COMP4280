@@ -9,6 +9,8 @@ Required Submissions Provided
 
 #3: Instructions on how to use the application
 
-#4: Executable
+#4: Source Code Archive
 
-#5: Bibliography Summaries
+#5: Executable
+
+#6: Bibliography Summaries (COMP4280 Weekly Submissions)

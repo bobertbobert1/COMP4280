@@ -60,7 +60,7 @@ function sleep(ms)
 prodcounter.onclick = async function()
 {
 	//If that prevents you from going into negative currency trying to buy producers
-	if(count>=5)
+	if(count>=50)
 	{
 		count-=50;
 		prodcount++;
@@ -69,7 +69,7 @@ prodcounter.onclick = async function()
 	}
 	
 	//If statement to unlock stage 3 aka the shop
-	if(prodcount==1)
+	if(prodcount==10)
 	{
 		shoptitle.style.display = "initial";
 		shopselect.style.display = "initial";

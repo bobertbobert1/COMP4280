@@ -1,0 +1,312 @@
+<html>
+<head>
+    <script>
+		window.onload = function() 
+{
+
+var counter = document.getElementById("addCurrency"), count = 0;
+var prodcounter = document.getElementById("addProducer"), prodcount = 0, prodtrue = 0, speedboost=1;
+var applecounter = document.getElementById("apples");
+var bcounter = document.getElementById("addBanana"), bcount = 0, btrue = 0;
+var shopselect = document.getElementById("shopselect");
+var shoptitle = document.getElementById("shoptitle");
+var purchase = document.getElementById("purchase");
+var spinner = document.getElementById("spin");
+
+shopselect.style.display = "none";
+shoptitle.style.display = "none";
+
+//Apple Button
+counter.onclick = function() 
+{
+	count+=1;
+	
+	//Updating text without producer counter
+	if(!prodtrue)
+	{
+		applecounter.innerHTML = "Current Apples: "+count;
+	}
+	
+	
+	//Updating text with producer counter
+	if(prodtrue)
+	{
+		//Updating text with banana counter
+		if(btrue)
+		{
+			applecounter.innerHTML = "Current Apples: "+count+"<br />Current Bananas: "+bcount+"<br />Current Producers: "+prodcount;
+		}
+		else
+		{
+			applecounter.innerHTML = "Current Apples: "+count+"<br />Current Producers: "+prodcount;
+		}
+	}
+	
+	//For unlocking the producer button
+	if(count==10)
+	{
+		prodcounter.setAttribute('type', 'button');
+	}
+	
+};
+
+//Sleep Function
+function sleep(ms) 
+{
+  return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+//Producer Button
+prodcounter.onclick = async function()
+{
+	//If that prevents you from going into negative currency trying to buy producers
+	if(count>=5)
+	{
+		count-=50;
+		prodcount++;
+		prodtrue=1;
+		applecounter.innerHTML = "Current Apples: "+count+"<br />Current Producers: "+prodcount;
+	}
+	
+	//If statement to unlock stage 3 aka the shop
+	if(prodcount==1)
+	{
+		shoptitle.style.display = "initial";
+		shopselect.style.display = "initial";
+		purchase.setAttribute('type', 'button');
+		
+	}
+	//Producer loop
+	while(prodcount>=1)
+	{
+		await sleep(1000/speedboost);
+		count+=(prodcount);
+		if(!btrue)
+		{
+			applecounter.innerHTML = "Current Apples: "+count+"<br />Current Producers: "+prodcount;
+		}
+		else
+		{
+			applecounter.innerHTML = "Current Apples: "+count+"<br />Current Bananas: "+bcount+"<br />Current Producers: "+prodcount;
+		}
+	};
+}
+
+//Shop purchase button
+//Will need to add and statements for when section is complete for prices
+purchase.onclick = async function()
+{
+	//Shop option for boosting producer speed
+	if(shopselect.value = "speed"&&count>=500)
+	{
+		speedboost = 1.1;
+		count-=500;
+		shopselect.options[0].text = "SOLD OUT";
+		shopselect.value = "speed";
+	}
+	
+	//Shop option for doubling the amount of apple producers the user has
+	if(shopselect.value = "double"&&count>=2500)
+	{
+		prodcount = prodcount*2;
+		count-=2500;
+		shopselect.options[1].text = "SOLD OUT";
+	}
+	
+	//Shop option for unlocking banana production
+	if(shopselect.value = "bananas"&&prodcount>=100)
+	{
+		prodcount-=100;
+		bcounter.setAttribute('type', 'button');
+		shopselect.options[2].text = "SOLD OUT";
+		btrue = 1;
+	}
+	
+	//Shop option for unlocking stage 4
+	if(shopselect.value = "stage4" && bcount>=100)
+	{
+		bcount-=100;
+		shopselect.options[3].text = "SOLD OUT";
+		shoptitle.innerHTML = "Stage 3 completed, please begin gambling.";
+		spinner.setAttribute('type','button');
+		drawRouletteWheel();
+		purchase.setAttribute('type', 'hidden');
+	}
+}
+
+//Banana Button
+bcounter.onclick = async function()
+{
+	bcount++;
+	applecounter.innerHTML = "Current Apples: "+count+"<br />Current Bananas: "+bcount+"<br />Current Producers: "+prodcount;
+}
+
+//Stage 4 - Gambling used sample code from: https://codepen.io/barney-parker/pen/OPyYqy/
+var options = ["100 B.", "10 B.", "25 B.", "250 B.", "30 B.", "1000 B.", "1 B.", "200 B.", "45 B.", "500 B.", "5 B.", "20 B.", "Lose", "10000 B.", "Lose", "350 B.", "5 B.", "99 B."];
+var startAngle = 0;
+var arc = Math.PI / (options.length / 2);
+var spinTimeout = null;
+var spinArcStart = 10;
+var spinTime = 0;
+var spinTimeTotal = 0;
+var ctx;
+
+
+function byte2Hex(n) {
+  var nybHexString = "0123456789ABCDEF";
+  return String(nybHexString.substr((n >> 4) & 0x0F,1)) + nybHexString.substr(n & 0x0F,1);
+}
+
+function RGB2Color(r,g,b) {
+	return '#' + byte2Hex(r) + byte2Hex(g) + byte2Hex(b);
+}
+
+function getColor(item, maxitem) 
+{
+  var phase = 0;
+  var center = 128;
+  var width = 127;
+  var frequency = Math.PI*2/maxitem;
+  
+  red   = Math.sin(frequency*item+2+phase) * width + center;
+  green = Math.sin(frequency*item+0+phase) * width + center;
+  blue  = Math.sin(frequency*item+4+phase) * width + center;
+  
+  return RGB2Color(red,green,blue);
+}
+
+function drawRouletteWheel() 
+{
+  var canvas = document.getElementById("canvas");
+  if (canvas.getContext) {
+    var outsideRadius = 200;
+    var textRadius = 160;
+    var insideRadius = 125;
+
+    ctx = canvas.getContext("2d");
+    ctx.clearRect(0,0,500,500);
+
+    ctx.strokeStyle = "black";
+    ctx.lineWidth = 2;
+
+    ctx.font = 'bold 12px Helvetica, Arial';
+
+    for(var i = 0; i < options.length; i++) {
+      var angle = startAngle + i * arc;
+      //ctx.fillStyle = colors[i];
+      ctx.fillStyle = getColor(i, options.length);
+
+      ctx.beginPath();
+      ctx.arc(250, 250, outsideRadius, angle, angle + arc, false);
+      ctx.arc(250, 250, insideRadius, angle + arc, angle, true);
+      ctx.stroke();
+      ctx.fill();
+
+      ctx.save();
+      ctx.shadowOffsetX = -1;
+      ctx.shadowOffsetY = -1;
+      ctx.shadowBlur    = 0;
+      ctx.shadowColor   = "rgb(220,220,220)";
+      ctx.fillStyle = "black";
+      ctx.translate(250 + Math.cos(angle + arc / 2) * textRadius, 
+                    250 + Math.sin(angle + arc / 2) * textRadius);
+      ctx.rotate(angle + arc / 2 + Math.PI / 2);
+      var text = options[i];
+      ctx.fillText(text, -ctx.measureText(text).width / 2, 0);
+      ctx.restore();
+    } 
+
+    //Arrow
+    ctx.fillStyle = "black";
+    ctx.beginPath();
+    ctx.moveTo(250 - 4, 250 - (outsideRadius + 5));
+    ctx.lineTo(250 + 4, 250 - (outsideRadius + 5));
+    ctx.lineTo(250 + 4, 250 - (outsideRadius - 5));
+    ctx.lineTo(250 + 9, 250 - (outsideRadius - 5));
+    ctx.lineTo(250 + 0, 250 - (outsideRadius - 13));
+    ctx.lineTo(250 - 9, 250 - (outsideRadius - 5));
+    ctx.lineTo(250 - 4, 250 - (outsideRadius - 5));
+    ctx.lineTo(250 - 4, 250 - (outsideRadius + 5));
+    ctx.fill();
+  }
+}
+
+function rotateWheel() 
+{
+  spinTime += 30;
+  if(spinTime >= spinTimeTotal) {
+    stopRotateWheel();
+    return;
+  }
+  var spinAngle = spinAngleStart - easeOut(spinTime, 0, spinAngleStart, spinTimeTotal);
+  startAngle += (spinAngle * Math.PI / 180);
+  drawRouletteWheel();
+  sleep(30);
+}
+
+function spin()
+{
+  spinAngleStart = Math.random() * 10 + 10;
+  spinTime = 0;
+  spinTimeTotal = Math.random() * 3 + 4 * 1000;
+  rotateWheel();
+}
+
+
+function stopRotateWheel() {
+  clearTimeout(spinTimeout);
+  var degrees = startAngle * 180 / Math.PI + 90;
+  var arcd = arc * 180 / Math.PI;
+  var index = Math.floor((360 - degrees % 360) / arcd);
+  ctx.save();
+  ctx.font = 'bold 30px Helvetica, Arial';
+  var text = options[index]
+  ctx.fillText(text, 250 - ctx.measureText(text).width / 2, 250 + 10);
+  ctx.restore();
+}
+
+function easeOut(t, b, c, d) {
+  var ts = (t/=d)*t;
+  var tc = ts*t;
+  return b+c*(tc + -3*ts + 3*t);
+}
+
+};
+
+
+	</script>
+</head>
+
+<body style=" background: lightblue;">
+	<div class="stats">
+    <p>
+		<h3>Apple Farmer</h3>
+    </p>
+	<p id="apples">Current Apples: 0</p>
+	</div>
+	
+  <body>
+	<div class="controls">
+    <p>
+      <button id="addCurrency">Get an Apple</button>
+	  <input type="hidden" id="addProducer" value="Get a Producer (50 A.)"/>
+	  <input type="hidden" id="addBanana" value="Get a Banana" />
+	  <input type="hidden" id="purchase" value="Purchase Shop Item">
+    </p>
+	</div>
+	
+	<p id="shoptitle">Shop: </p>
+	
+<select name="shop" id="shopselect">
+  <option value="speed">Producer Speed Buff(10%) - 500 Apples</option>
+  <option value="double">Double Your Apple Producers - 2,500 Apples</option>
+  <option value="bananas">Invest in Bananas - 100 Producers</option>
+  <option value="stage4">Unlock Stage 4 - 100 Bananas</option>
+</select>
+<br><br>
+
+<input type="hidden" value="Spin Wheel(100 B.)" style="float:left;" id="spin" />
+<canvas id="canvas" width="500" height="500"></canvas>
+
+</body>
+</html>
